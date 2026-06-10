@@ -1,12 +1,20 @@
-const STORAGE_KEY = "tabletten_medicines";
+const STORAGE_KEY = "tabletten_medicines_v2";
 
-const nameInput = document.getElementById("name");
-const stockInput = document.getElementById("stock");
-const dailyDoseInput = document.getElementById("dailyDose");
-const reminderLimitInput = document.getElementById("reminderLimit");
-const saveBtn = document.getElementById("saveBtn");
-const notifyBtn = document.getElementById("notifyBtn");
-const medicineList = document.getElementById("medicineList");
+const elements = {
+  name: document.getElementById("name"),
+  packSize: document.getElementById("packSize"),
+  stock: document.getElementById("stock"),
+  dailyDose: document.getElementById("dailyDose"),
+  reminderLimit: document.getElementById("reminderLimit"),
+  color: document.getElementById("color"),
+  saveBtn: document.getElementById("saveBtn"),
+  notifyBtn: document.getElementById("notifyBtn"),
+  checkBtn: document.getElementById("checkBtn"),
+  list: document.getElementById("medicineList"),
+  countTotal: document.getElementById("countTotal"),
+  countWarning: document.getElementById("countWarning"),
+  countCritical: document.getElementById("countCritical")
+};
 
 let medicines = loadMedicines();
 
@@ -28,9 +36,10 @@ function formatDate(date) {
 }
 
 function calculate(medicine) {
-  const daysRemaining = Math.floor(medicine.stock / medicine.dailyDose);
-  const usableStock = medicine.stock - medicine.reminderLimit;
-  const daysUntilReminder = usableStock <= 0 ? 0 : Math.floor(usableStock / medicine.dailyDose);
+  const dailyDose = Math.max(Number(medicine.dailyDose), 0.1);
+  const daysRemaining = Math.floor(Number(medicine.stock) / dailyDose);
+  const usableStock = Number(medicine.stock) - Number(medicine.reminderLimit);
+  const daysUntilReminder = usableStock <= 0 ? 0 : Math.floor(usableStock / dailyDose);
 
   const emptyDate = new Date();
   emptyDate.setDate(emptyDate.getDate() + daysRemaining);
@@ -41,43 +50,75 @@ function calculate(medicine) {
   return { daysRemaining, daysUntilReminder, emptyDate, reminderDate };
 }
 
+function getStatus(medicine) {
+  const data = calculate(medicine);
+  if (Number(medicine.stock) <= Number(medicine.reminderLimit)) {
+    return { className: "critical", label: "Sofort bestellen" };
+  }
+  if (data.daysUntilReminder <= 7) {
+    return { className: "warning", label: "Bald bestellen" };
+  }
+  return { className: "ok", label: "Ausreichend" };
+}
+
 function renderMedicines() {
-  medicineList.innerHTML = "";
+  elements.list.innerHTML = "";
+
+  let warning = 0;
+  let critical = 0;
+
+  medicines.forEach(medicine => {
+    const status = getStatus(medicine);
+    if (status.className === "warning") warning++;
+    if (status.className === "critical") critical++;
+  });
+
+  elements.countTotal.textContent = medicines.length;
+  elements.countWarning.textContent = warning;
+  elements.countCritical.textContent = critical;
 
   if (medicines.length === 0) {
-    medicineList.innerHTML = '<div class="empty">Noch kein Medikament angelegt.</div>';
+    elements.list.innerHTML = '<div class="empty">Noch kein Medikament angelegt.</div>';
     return;
   }
 
-  medicines.forEach((medicine) => {
-    const data = calculate(medicine);
-    const div = document.createElement("div");
+  medicines
+    .slice()
+    .sort((a, b) => calculate(a).daysUntilReminder - calculate(b).daysUntilReminder)
+    .forEach((medicine) => {
+      const data = calculate(medicine);
+      const status = getStatus(medicine);
+      const div = document.createElement("div");
 
-    let statusClass = "";
-    if (medicine.stock <= medicine.reminderLimit) {
-      statusClass = "critical";
-    } else if (data.daysUntilReminder <= 7) {
-      statusClass = "warning";
-    }
+      div.className = `medicine ${medicine.color} ${status.className}`;
+      div.innerHTML = `
+        <div class="medicine-header">
+          <h3>💊 ${escapeHtml(medicine.name)}</h3>
+          <span class="badge ${status.className}">${status.label}</span>
+        </div>
 
-    div.className = `medicine ${statusClass}`;
-    div.innerHTML = `
-      <h3>${escapeHtml(medicine.name)}</h3>
-      <div class="info">
-        Bestand: <strong>${medicine.stock} Stück</strong><br>
-        Einnahme: <strong>${medicine.dailyDose} pro Tag</strong><br>
-        Reicht bis: <strong>${formatDate(data.emptyDate)}</strong><br>
-        Nachbestellen ab: <strong>${formatDate(data.reminderDate)}</strong>
-      </div>
-      <button class="delete" onclick="deleteMedicine(${medicine.id})">Löschen</button>
-    `;
+        <div class="info">
+          Bestand: <strong>${medicine.stock} Stück</strong><br>
+          Packungsgröße: <strong>${medicine.packSize} Stück</strong><br>
+          Einnahme: <strong>${medicine.dailyDose} pro Tag</strong><br>
+          Reicht noch: <strong>${data.daysRemaining} Tage</strong><br>
+          Nachbestellen ab: <strong>${formatDate(data.reminderDate)}</strong><br>
+          Voraussichtlich leer: <strong>${formatDate(data.emptyDate)}</strong>
+        </div>
 
-    medicineList.appendChild(div);
-  });
+        <div class="action-grid">
+          <button class="take" onclick="takeToday(${medicine.id})">Heute eingenommen</button>
+          <button class="pack" onclick="addPack(${medicine.id})">Neue Packung erhalten</button>
+        </div>
+        <button class="delete" onclick="deleteMedicine(${medicine.id})">Löschen</button>
+      `;
+
+      elements.list.appendChild(div);
+    });
 }
 
 function escapeHtml(text) {
-  return text.replace(/[&<>"']/g, function(match) {
+  return String(text).replace(/[&<>"']/g, function(match) {
     return {
       "&": "&amp;",
       "<": "&lt;",
@@ -89,36 +130,61 @@ function escapeHtml(text) {
 }
 
 function addMedicine() {
-  const name = nameInput.value.trim();
-  const stock = Number(stockInput.value);
-  const dailyDose = Number(String(dailyDoseInput.value).replace(",", "."));
-  const reminderLimit = Number(reminderLimitInput.value);
+  const medicine = {
+    id: Date.now(),
+    name: elements.name.value.trim(),
+    packSize: Number(elements.packSize.value),
+    stock: Number(elements.stock.value),
+    dailyDose: Number(String(elements.dailyDose.value).replace(",", ".")),
+    reminderLimit: Number(elements.reminderLimit.value),
+    color: elements.color.value
+  };
 
-  if (!name || Number.isNaN(stock) || Number.isNaN(dailyDose) || Number.isNaN(reminderLimit)) {
+  if (!medicine.name || !validNumber(medicine.packSize, 1) || !validNumber(medicine.stock, 0) ||
+      !validNumber(medicine.dailyDose, 0.1) || !validNumber(medicine.reminderLimit, 0)) {
     alert("Bitte alle Felder korrekt ausfüllen.");
     return;
   }
 
-  if (stock < 0 || dailyDose <= 0 || reminderLimit < 0) {
-    alert("Bitte gültige Werte eingeben.");
-    return;
-  }
-
-  const medicine = { id: Date.now(), name, stock, dailyDose, reminderLimit };
-
   medicines.push(medicine);
   saveMedicines();
-  showImmediateReminderIfNeeded(medicine);
   renderMedicines();
+  checkReminders(false);
 
-  nameInput.value = "";
-  stockInput.value = "";
-  dailyDoseInput.value = "1";
-  reminderLimitInput.value = "10";
+  elements.name.value = "";
+  elements.packSize.value = "";
+  elements.stock.value = "";
+  elements.dailyDose.value = "1";
+  elements.reminderLimit.value = "10";
+  elements.color.value = "blue";
+}
+
+function validNumber(value, min) {
+  return !Number.isNaN(value) && value >= min;
 }
 
 function deleteMedicine(id) {
+  if (!confirm("Medikament wirklich löschen?")) return;
   medicines = medicines.filter(m => m.id !== id);
+  saveMedicines();
+  renderMedicines();
+}
+
+function takeToday(id) {
+  const medicine = medicines.find(m => m.id === id);
+  if (!medicine) return;
+
+  medicine.stock = Math.max(0, Number(medicine.stock) - Number(medicine.dailyDose));
+  saveMedicines();
+  renderMedicines();
+  checkReminders(false);
+}
+
+function addPack(id) {
+  const medicine = medicines.find(m => m.id === id);
+  if (!medicine) return;
+
+  medicine.stock = Number(medicine.stock) + Number(medicine.packSize);
   saveMedicines();
   renderMedicines();
 }
@@ -133,28 +199,40 @@ async function enableNotifications() {
 
   if (permission === "granted") {
     alert("Benachrichtigungen sind aktiviert.");
+    checkReminders(false);
   } else {
     alert("Benachrichtigungen wurden nicht erlaubt.");
   }
 }
 
-function showImmediateReminderIfNeeded(medicine) {
-  if (!("Notification" in window) || Notification.permission !== "granted") {
+function checkReminders(showAlert = true) {
+  const criticalMedicines = medicines.filter(m => getStatus(m).className === "critical");
+
+  if (criticalMedicines.length === 0) {
+    if (showAlert) alert("Alles in Ordnung. Kein Medikament ist kritisch.");
     return;
   }
 
-  if (medicine.stock <= medicine.reminderLimit) {
+  const text = criticalMedicines.map(m => `- ${m.name}`).join("\n");
+
+  if ("Notification" in window && Notification.permission === "granted") {
     new Notification("Tabletten nachbestellen", {
-      body: `${medicine.name} sollte nachbestellt werden.`
+      body: criticalMedicines.map(m => m.name).join(", ")
     });
+  }
+
+  if (showAlert) {
+    alert("Bitte nachbestellen:\n\n" + text);
   }
 }
 
-saveBtn.addEventListener("click", addMedicine);
-notifyBtn.addEventListener("click", enableNotifications);
+elements.saveBtn.addEventListener("click", addMedicine);
+elements.notifyBtn.addEventListener("click", enableNotifications);
+elements.checkBtn.addEventListener("click", () => checkReminders(true));
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
 
 renderMedicines();
+setTimeout(() => checkReminders(false), 800);

@@ -3,9 +3,9 @@
   "short_name": "Tabletten",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#f3f5f7",
-  "theme_color": "#1976d2",
-  "description": "Erinnert an das Nachbestellen von Tabletten.",
+  "background_color": "#eef2f7",
+  "theme_color": "#2563eb",
+  "description": "PWA zur Erinnerung an Tabletten-Nachbestellungen.",
   "icons": [
     {
       "src": "icon-192.png",
