@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Tabletten Erinnerung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1976d2">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Tabletten Erinnerung</h1>
+    <p>Nachbestellen nicht vergessen</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Medikament anlegen</h2>
+
+      <label>
+        Name des Medikaments
+        <input id="name" type="text" placeholder="z. B. Blutdrucktabletten">
+      </label>
+
+      <label>
+        Aktueller Bestand / Stück
+        <input id="stock" type="number" min="0" step="1" placeholder="z. B. 30">
+      </label>
+
+      <label>
+        Einnahme pro Tag
+        <input id="dailyDose" type="number" min="0.1" step="0.1" value="1">
+      </label>
+
+      <label>
+        Erinnern ab Restbestand / Stück
+        <input id="reminderLimit" type="number" min="0" step="1" value="10">
+      </label>
+
+      <button id="saveBtn">Speichern</button>
+      <button id="notifyBtn" class="secondary">Benachrichtigung aktivieren</button>
+    </section>
+
+    <section>
+      <h2>Übersicht</h2>
+      <div id="medicineList" class="list"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

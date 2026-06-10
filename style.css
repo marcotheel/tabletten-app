@@ -1,0 +1,86 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f3f5f7;
+  color: #1f2933;
+}
+
+header {
+  background: #1976d2;
+  color: white;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+header p {
+  margin: 6px 0 0;
+  opacity: 0.9;
+}
+
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.card,
+.medicine {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+}
+
+h2 { margin-top: 0; }
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+input {
+  width: 100%;
+  display: block;
+  margin-top: 6px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+}
+
+button {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #1976d2;
+  color: white;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+button.secondary { background: #334155; }
+button.delete { background: #dc2626; }
+
+.medicine { border-left: 10px solid #22c55e; }
+.medicine.warning { border-left-color: #f59e0b; }
+.medicine.critical { border-left-color: #ef4444; }
+
+.medicine h3 { margin: 0 0 8px; }
+.info { line-height: 1.6; }
+
+.empty {
+  text-align: center;
+  padding: 24px;
+  color: #64748b;
+}
