@@ -1,12 +1,11 @@
-# Tabletten Erinnerung – PWA Version 5
+# Tabletten Erinnerung – PWA Version 6
 
-Neue Schwerpunkte:
-- frei konfigurierbare Einnahmezeiten, z. B. 08:00, 12:00, 20:00
-- Tagesübersicht mit offenen Einnahmen
-- Einnahmeprotokoll
-- Barcode-/PZN-Scanner über Kamera, wenn vom Browser unterstützt
-- manuelle PZN-Eingabe als Fallback
-- Nachbestellliste
-- Backup Import/Export
+Änderungen:
+- PZN/Barcode-Feld wird nach Scan gefüllt.
+- Anzeige heißt jetzt PZN/Barcode statt nur Code.
+- Button „PZN-Daten suchen“ ergänzt.
+- Nach Scan wird automatisch versucht, Name/Form/Packungsgröße aus der öffentlichen BfArM-PZN-Liste zu übernehmen.
+- Falls der Browser den Zugriff blockiert, bleibt die manuelle Eingabe möglich.
 
-Hinweis: Der Barcode-Scanner benötigt HTTPS. Auf GitHub Pages ist das erfüllt. Unter iPhone/Safari kann die BarcodeDetector-Unterstützung eingeschränkt sein.
+Hinweis:
+Eine vollständige automatische Befüllung aller Medikamentendaten benötigt eine professionelle Arzneimittel-Datenbank/API.

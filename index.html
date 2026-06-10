@@ -1,1 +1,92 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Tabletten Erinnerung V5</title><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#2563eb"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css"></head><body><header><div><h1>💊 Tabletten Erinnerung</h1><p>Einnahmezeiten · Protokoll · PZN/Barcode-Scanner</p></div><button id="themeBtn">🌙</button></header><main><section class="stats"><div><b id="total">0</b><span>Medikamente</span></div><div><b id="due">0</b><span>Heute offen</span></div><div><b id="critical">0</b><span>Kritisch</span></div></section><section class="card"><h2>Medikament anlegen / bearbeiten</h2><label>Name<input id="name" placeholder="z. B. Blutdrucktabletten"></label><div class="grid"><label>Wirkstoff<input id="substance" placeholder="z. B. Ramipril"></label><label>Stärke<input id="strength" placeholder="z. B. 5 mg"></label></div><div class="grid"><label>Hersteller<input id="manufacturer"></label><label>PZN / Barcode<div class="inline"><input id="pzn" placeholder="manuell oder scannen"><button id="scanBtn" type="button">📷</button></div></label></div><div class="grid"><label>Packungsgröße<input id="packSize" type="number" min="1"></label><label>Bestand<input id="stock" type="number" min="0"></label></div><div class="grid"><label>Dosis je Einnahme<input id="dosePerTake" type="number" min="0.25" step="0.25" value="1"></label><label>Erinnern ab Restbestand<input id="limit" type="number" min="0" value="10"></label></div><label>Einnahmezeiten<input id="times" placeholder="z. B. 08:00, 20:00"></label><label>Notiz<textarea id="note"></textarea></label><button id="saveBtn">Speichern</button><button id="cancelBtn" class="secondary hidden">Abbrechen</button></section><section id="scanner" class="card hidden"><h2>Barcode/PZN scannen</h2><video id="video" autoplay playsinline></video><p>Kamera auf Barcode halten.</p><button id="stopScanBtn" class="secondary">Scanner schließen</button></section><section class="card"><h2>Heute fällige Einnahmen</h2><div id="todayList"></div></section><section class="card"><h2>Einnahmeprotokoll</h2><div id="historyList"></div><button id="clearHistoryBtn" class="danger">Protokoll löschen</button></section><section class="card"><h2>Nachbestellliste</h2><div id="orderList"></div><button id="copyOrderBtn" class="secondary">Liste kopieren</button></section><section class="card"><h2>Backup</h2><div class="grid"><button id="exportBtn">Exportieren</button><button id="importBtn" class="secondary">Importieren</button></div><input id="importFile" type="file" accept=".json" hidden></section><section><h2>Übersicht</h2><div id="medList"></div></section></main><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Tabletten Erinnerung V6</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>💊 Tabletten Erinnerung</h1>
+    <p>Einnahmezeiten · Protokoll · PZN-Suche</p>
+  </div>
+  <button id="themeBtn">🌙</button>
+</header>
+
+<main>
+  <section class="stats">
+    <div><b id="total">0</b><span>Medikamente</span></div>
+    <div><b id="due">0</b><span>Heute offen</span></div>
+    <div><b id="critical">0</b><span>Kritisch</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Medikament anlegen / bearbeiten</h2>
+
+    <label>Name / Handelsname<input id="name" placeholder="wird nach PZN-Suche gefüllt"></label>
+
+    <div class="grid">
+      <label>Wirkstoff<input id="substance" placeholder="optional manuell"></label>
+      <label>Stärke / Form<input id="strength" placeholder="z. B. Tabletten, Lösung"></label>
+    </div>
+
+    <div class="grid">
+      <label>Hersteller<input id="manufacturer" placeholder="optional manuell"></label>
+      <label>PZN / Barcode
+        <div class="inline">
+          <input id="pzn" placeholder="PZN scannen oder eingeben">
+          <button id="scanBtn" type="button">📷</button>
+        </div>
+      </label>
+    </div>
+
+    <button id="lookupBtn" class="secondary" type="button">PZN-Daten suchen</button>
+    <p id="lookupInfo" class="muted"></p>
+
+    <div class="grid">
+      <label>Packungsgröße<input id="packSize" type="number" min="1"></label>
+      <label>Bestand<input id="stock" type="number" min="0"></label>
+    </div>
+
+    <div class="grid">
+      <label>Einnahme pro Einnahme<input id="dosePerTake" type="number" min="0.25" step="0.25" value="1"></label>
+      <label>Erinnern ab Restbestand<input id="limit" type="number" min="0" value="10"></label>
+    </div>
+
+    <label>Einnahmezeiten<input id="times" placeholder="z. B. 08:00, 20:00"></label>
+    <label>Notiz<textarea id="note"></textarea></label>
+
+    <button id="saveBtn">Speichern</button>
+    <button id="cancelBtn" class="secondary hidden">Abbrechen</button>
+  </section>
+
+  <section id="scanner" class="card hidden">
+    <h2>PZN / Barcode scannen</h2>
+    <video id="video" autoplay playsinline></video>
+    <p id="scanInfo">Kamera wird gestartet...</p>
+    <button id="stopScanBtn" class="secondary">Scanner schließen</button>
+  </section>
+
+  <section class="card"><h2>Heute fällige Einnahmen</h2><div id="todayList"></div></section>
+  <section class="card"><h2>Einnahmeprotokoll</h2><div id="historyList"></div><button id="clearHistoryBtn" class="danger">Protokoll löschen</button></section>
+  <section class="card"><h2>Nachbestellliste</h2><div id="orderList"></div><button id="copyOrderBtn" class="secondary">Liste kopieren</button></section>
+
+  <section class="card">
+    <h2>Backup</h2>
+    <div class="grid">
+      <button id="exportBtn">Exportieren</button>
+      <button id="importBtn" class="secondary">Importieren</button>
+    </div>
+    <input id="importFile" type="file" accept=".json" hidden>
+  </section>
+
+  <section><h2>Übersicht</h2><div id="medList"></div></section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
