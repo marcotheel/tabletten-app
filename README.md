@@ -1,20 +1,12 @@
-# Tabletten Erinnerung – PWA Version 4
+# Tabletten Erinnerung – PWA Version 5
 
-Neue Funktionen:
-- Einnahmezeiten pro Medikament, z. B. `08:00, 20:00`
-- Heute fällige Einnahmen
-- Einnahmeprotokoll mit Verlauf
-- Foto der Packung speichern
-- Herstellerfeld
-- PZN-/Barcode-Feld
-- Backup inklusive Verlauf
-- verbesserte Tagesprüfung beim Öffnen
-- offlinefähig und als PWA installierbar
+Neue Schwerpunkte:
+- frei konfigurierbare Einnahmezeiten, z. B. 08:00, 12:00, 20:00
+- Tagesübersicht mit offenen Einnahmen
+- Einnahmeprotokoll
+- Barcode-/PZN-Scanner über Kamera, wenn vom Browser unterstützt
+- manuelle PZN-Eingabe als Fallback
+- Nachbestellliste
+- Backup Import/Export
 
-Update auf GitHub Pages:
-1. ZIP entpacken
-2. Alle Dateien in `tabletten-app` hochladen und vorhandene Dateien ersetzen
-3. Commit changes klicken
-4. App-Link neu laden
-
-Falls noch die alte Version angezeigt wird: Cache leeren oder PWA vom Homescreen löschen und neu hinzufügen.
+Hinweis: Der Barcode-Scanner benötigt HTTPS. Auf GitHub Pages ist das erfüllt. Unter iPhone/Safari kann die BarcodeDetector-Unterstützung eingeschränkt sein.
