@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>Tabletten Erinnerung V2</title>
+  <title>Tabletten Erinnerung V3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#2563eb">
   <link rel="manifest" href="manifest.json">
@@ -11,39 +11,39 @@
 <body>
   <header class="app-header">
     <div>
-      <h1>Tabletten Erinnerung</h1>
-      <p>Bestand prüfen · Nachbestellen · Einnahme dokumentieren</p>
+      <h1>💊 Tabletten Erinnerung</h1>
+      <p>Bestand · Einnahme · Nachbestellung · Backup</p>
     </div>
+    <button id="darkModeBtn" class="header-btn">🌙</button>
   </header>
 
   <main>
     <section class="summary-grid">
-      <div class="summary-card">
-        <span id="countTotal">0</span>
-        <small>Medikamente</small>
-      </div>
-      <div class="summary-card warning">
-        <span id="countWarning">0</span>
-        <small>Bald bestellen</small>
-      </div>
-      <div class="summary-card critical">
-        <span id="countCritical">0</span>
-        <small>Kritisch</small>
-      </div>
+      <div class="summary-card"><span id="countTotal">0</span><small>Medikamente</small></div>
+      <div class="summary-card warning"><span id="countWarning">0</span><small>Bald bestellen</small></div>
+      <div class="summary-card critical"><span id="countCritical">0</span><small>Kritisch</small></div>
     </section>
 
     <section class="card">
       <h2>Medikament anlegen</h2>
 
-      <label>Name des Medikaments
+      <label>Name
         <input id="name" type="text" placeholder="z. B. Blutdrucktabletten">
       </label>
+
+      <div class="two-col">
+        <label>Wirkstoff
+          <input id="substance" type="text" placeholder="z. B. Ramipril">
+        </label>
+        <label>Stärke
+          <input id="strength" type="text" placeholder="z. B. 5 mg">
+        </label>
+      </div>
 
       <div class="two-col">
         <label>Packungsgröße / Stück
           <input id="packSize" type="number" min="1" step="1" placeholder="100">
         </label>
-
         <label>Aktueller Bestand / Stück
           <input id="stock" type="number" min="0" step="1" placeholder="30">
         </label>
@@ -53,11 +53,14 @@
         <label>Einnahme pro Tag
           <input id="dailyDose" type="number" min="0.1" step="0.1" value="1">
         </label>
-
         <label>Erinnern ab Restbestand
           <input id="reminderLimit" type="number" min="0" step="1" value="10">
         </label>
       </div>
+
+      <label>Notiz
+        <textarea id="note" placeholder="z. B. morgens nach dem Frühstück"></textarea>
+      </label>
 
       <label>Farbe
         <select id="color">
@@ -71,6 +74,21 @@
 
       <button id="saveBtn">Speichern</button>
       <button id="notifyBtn" class="secondary">Benachrichtigung aktivieren</button>
+    </section>
+
+    <section class="card">
+      <h2>Nachbestellliste</h2>
+      <div id="shoppingList" class="shopping-list"></div>
+      <button id="copyShoppingBtn" class="secondary">Nachbestellliste kopieren</button>
+    </section>
+
+    <section class="card">
+      <h2>Datensicherung</h2>
+      <div class="action-grid">
+        <button id="exportBtn">Backup exportieren</button>
+        <button id="importBtn" class="secondary">Backup importieren</button>
+      </div>
+      <input id="importFile" type="file" accept=".json" hidden>
     </section>
 
     <section>

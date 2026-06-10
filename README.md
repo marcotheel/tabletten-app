@@ -1,24 +1,26 @@
-# Tabletten Erinnerung – PWA Version 2
+# Tabletten Erinnerung – PWA Version 3
 
 ## Neue Funktionen
 
-- moderne Übersicht
-- Ampelstatus
-- Packungsgröße
-- Button „Heute eingenommen“
-- Button „Neue Packung erhalten“
-- Nachbestellprüfung
-- lokale Speicherung
-- offline nutzbar
+- Dunkelmodus
+- Wirkstoff und Stärke
+- Notizen
+- Bearbeiten bestehender Einträge
+- Nachbestellliste
+- Nachbestellliste kopieren
+- Backup als JSON exportieren
+- Backup importieren
+- verbesserte Offline-Unterstützung
 - installierbar auf Android und iPhone
 
 ## Update auf GitHub Pages
 
 1. ZIP entpacken
-2. Alle Dateien in deinem Repository `tabletten-app` ersetzen
+2. Alle Dateien in deinem Repository `tabletten-app` hochladen und vorhandene Dateien ersetzen
 3. Commit changes klicken
-4. Seite neu laden
+4. App-Link neu laden
 
-Falls alte Daten im Browser nicht aktualisiert werden:
-- Browsercache leeren
-- PWA vom Homescreen löschen und neu hinzufügen
+Falls die alte Version angezeigt wird:
+- Browser neu laden
+- Cache leeren
+- installierte PWA vom Homescreen löschen und neu hinzufügen
