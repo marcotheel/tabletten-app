@@ -1,11 +1,13 @@
-# Tabletten Erinnerung – PWA Version 6
+# Tabletten Erinnerung – Dashboard-Version
 
-Änderungen:
-- PZN/Barcode-Feld wird nach Scan gefüllt.
-- Anzeige heißt jetzt PZN/Barcode statt nur Code.
-- Button „PZN-Daten suchen“ ergänzt.
-- Nach Scan wird automatisch versucht, Name/Form/Packungsgröße aus der öffentlichen BfArM-PZN-Liste zu übernehmen.
-- Falls der Browser den Zugriff blockiert, bleibt die manuelle Eingabe möglich.
+Startseite zeigt nur das Wichtigste:
+- Tagesstatus
+- offene Einnahmen
+- Nachbestellungen
 
-Hinweis:
-Eine vollständige automatische Befüllung aller Medikamentendaten benötigt eine professionelle Arzneimittel-Datenbank/API.
+Eingaben sind in Unterseiten:
+- Medikamente
+- Formular
+- Protokoll
+- Bestellliste
+- Einstellungen

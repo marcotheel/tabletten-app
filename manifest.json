@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#eef2f7",
   "theme_color": "#2563eb",
-  "description": "PWA mit Einnahmezeiten, Protokoll und PZN-Suche.",
+  "description": "Dashboard-PWA für Tablettenverwaltung.",
   "icons": [
     {
       "src": "icon-192.png",
