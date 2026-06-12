@@ -1,33 +1,155 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Tabletten Kalender Fix</title><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2563eb"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css"></head><body>
-<header><h1>💊 Tabletten</h1><button id="themeBtn">🌙</button></header>
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>MediPlan V7</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>💊 MediPlan</h1>
+    <p>Medikamente • Termine • Erinnerungen</p>
+  </div>
+  <button id="themeBtn">🌙</button>
+</header>
+
 <main>
 <section id="page-dashboard" class="page active">
-<div class="hero"><div><span>Heute</span><h2 id="todayTitle">Alles im Blick</h2></div><button id="quickAddBtn">＋</button></div>
-<div class="stats"><div><b id="total">0</b><span>Medikamente</span></div><div><b id="due">0</b><span>Offen</span></div><div><b id="critical">0</b><span>Bestellen</span></div></div>
-<div class="card"><div class="head"><h2>🕗 Heute fällig</h2><button data-page="meds" class="link">Verwalten</button></div><div id="todayList"></div></div>
-<div class="card"><div class="head"><h2>📅 Nächste Termine</h2><button data-page="calendar" class="link">Kalender</button></div><div id="appointmentPreview"></div></div>
-<div class="card"><div class="head"><h2>⚠️ Nachbestellen</h2><button data-page="orders" class="link">Liste</button></div><div id="orderPreview"></div></div>
+  <div class="hero">
+    <div>
+      <span id="greeting">Guten Tag</span>
+      <h2 id="dashboardTitle">Alles im Blick</h2>
+      <p id="dashboardSub">Dein Gesundheits-Dashboard</p>
+    </div>
+  </div>
+
+  <div class="quick-grid">
+    <button id="quickMed">＋ Medikament</button>
+    <button id="quickAppt">＋ Termin</button>
+  </div>
+
+  <div class="stats">
+    <div><b id="total">0</b><span>Medikamente</span></div>
+    <div><b id="due">0</b><span>Offen</span></div>
+    <div><b id="critical">0</b><span>Bestellen</span></div>
+    <div><b id="progress">0%</b><span>Heute erledigt</span></div>
+  </div>
+
+  <div class="card highlight">
+    <h2>⏰ Nächste Einnahme</h2>
+    <div id="nextDose"></div>
+  </div>
+
+  <div class="card">
+    <h2>📅 Nächster Termin</h2>
+    <div id="nextAppointment"></div>
+  </div>
+
+  <div class="card">
+    <h2>🛒 Nachbestellung</h2>
+    <div id="orderPreview"></div>
+  </div>
 </section>
 
-<section id="page-meds" class="page"><div class="head"><h2>Medikamente</h2><button id="newMedBtn">＋ Neu</button></div><div id="medList"></div></section>
+<section id="page-meds" class="page">
+  <div class="head"><h2>💊 Medikamente</h2><button id="newMedBtn">＋ Neu</button></div>
+  <div id="medList"></div>
+</section>
 
-<section id="page-form" class="page"><div class="card"><h2 id="formTitle">Medikament anlegen</h2>
-<label>Name<input id="name"></label><div class="grid"><label>Wirkstoff<input id="substance"></label><label>Stärke/Form<input id="strength"></label></div>
-<div class="grid"><label>Hersteller<input id="manufacturer"></label><label>PZN/Barcode<input id="pzn"></label></div>
-<button id="lookupBtn" class="secondary">PZN über Server suchen</button><p id="lookupInfo" class="muted"></p>
-<div class="grid"><label>Packungsgröße<input id="packSize" type="number"></label><label>Bestand<input id="stock" type="number"></label></div>
-<div class="grid"><label>Einnahme je Einnahme<input id="dosePerTake" type="number" step="0.25" value="1"></label><label>Erinnern ab<input id="limit" type="number" value="10"></label></div>
-<label>Einnahmezeiten<input id="times" placeholder="08:00, 20:00"></label><label>Notiz<textarea id="note"></textarea></label>
-<button id="saveBtn">Speichern</button><button id="cancelBtn" class="secondary">Abbrechen</button></div></section>
+<section id="page-medform" class="page">
+  <div class="card">
+    <h2 id="formTitle">Medikament anlegen</h2>
+    <label>Name / Handelsname<input id="name"></label>
+    <div class="grid"><label>Wirkstoff<input id="substance"></label><label>Stärke/Form<input id="strength"></label></div>
+    <div class="grid"><label>Hersteller<input id="manufacturer"></label><label>PZN/Barcode<input id="pzn"></label></div>
+    <button id="lookupBtn" class="secondary">PZN über Server suchen</button><p id="lookupInfo" class="muted"></p>
+    <div class="grid"><label>Packungsgröße<input id="packSize" type="number"></label><label>Bestand<input id="stock" type="number"></label></div>
+    <div class="grid"><label>Einnahme je Einnahme<input id="dosePerTake" type="number" step="0.25" value="1"></label><label>Erinnern ab<input id="limit" type="number" value="10"></label></div>
+    <label>Einnahmezeiten<input id="times" placeholder="08:00, 12:00, 20:00"></label>
+    <label>Notiz<textarea id="note"></textarea></label>
+    <button id="saveBtn">Speichern</button>
+    <button id="cancelBtn" class="secondary">Abbrechen</button>
+  </div>
+</section>
 
 <section id="page-calendar" class="page">
-<div class="card"><h2>📅 Termin eintragen</h2><label>Titel<input id="apptTitle" placeholder="z. B. Arzttermin"></label><div class="grid"><label>Datum<input id="apptDate" type="date"></label><label>Uhrzeit<input id="apptTime" type="time"></label></div><label>Ort<input id="apptLocation"></label><label>Notiz<textarea id="apptNote"></textarea></label><button id="saveApptBtn">Termin speichern</button><p id="apptInfo" class="muted"></p></div>
-<div class="card"><h2>Alle Termine</h2><div id="appointmentList"></div></div>
+  <div class="card">
+    <h2>📅 Termin eintragen</h2>
+    <label>Titel<input id="apptTitle" placeholder="z. B. Hausarzt"></label>
+    <div class="grid"><label>Datum<input id="apptDate" type="date"></label><label>Uhrzeit<input id="apptTime" type="time"></label></div>
+    <label>Ort<input id="apptLocation"></label>
+    <label>Notiz<textarea id="apptNote"></textarea></label>
+    <button id="saveApptBtn">Termin speichern</button>
+    <p id="apptInfo" class="muted"></p>
+  </div>
+  <div class="card">
+    <h2>Alle Termine</h2>
+    <div id="appointmentList"></div>
+  </div>
 </section>
 
-<section id="page-history" class="page"><div class="card"><h2>📅 Einnahmeprotokoll</h2><div id="historyList"></div><button id="clearHistoryBtn" class="danger">Protokoll löschen</button></div></section>
-<section id="page-orders" class="page"><div class="card"><h2>🛒 Nachbestellliste</h2><div id="orderList"></div><button id="copyOrderBtn" class="secondary">Liste kopieren</button></div></section>
-<section id="page-settings" class="page"><div class="card"><h2>⚙️ Einstellungen</h2><label>PZN-Server URL<input id="serverUrl"></label><button id="saveServerBtn" class="secondary">Server speichern</button></div><div class="card"><h2>💾 Backup</h2><button id="exportBtn">Exportieren</button><button id="importBtn" class="secondary">Importieren</button><input id="importFile" type="file" accept=".json" hidden></div></section>
+<section id="page-reminders" class="page">
+  <div class="card">
+    <h2>🔔 Offene Einnahmen</h2>
+    <div id="todayList"></div>
+  </div>
+  <div class="card">
+    <h2>📅 Einnahmeprotokoll</h2>
+    <div id="historyList"></div>
+    <button id="clearHistoryBtn" class="danger">Protokoll löschen</button>
+  </div>
+</section>
+
+<section id="page-orders" class="page">
+  <div class="card">
+    <h2>🛒 Nachbestellliste</h2>
+    <div id="orderList"></div>
+    <button id="copyOrderBtn" class="secondary">Liste kopieren</button>
+  </div>
+</section>
+
+<section id="page-stats" class="page">
+  <div class="card">
+    <h2>📊 Statistik</h2>
+    <div id="statsText"></div>
+  </div>
+</section>
+
+<section id="page-settings" class="page">
+  <div class="card">
+    <h2>👤 Profil</h2>
+    <label>Name<input id="profileName" placeholder="z. B. Marco"></label>
+    <button id="saveProfileBtn" class="secondary">Profil speichern</button>
+  </div>
+  <div class="card">
+    <h2>⚙️ Server</h2>
+    <label>PZN-Server URL<input id="serverUrl"></label>
+    <button id="saveServerBtn" class="secondary">Server speichern</button>
+    <p class="muted">Raspberry Pi Beispiel: http://raspberrypi.local:5000</p>
+  </div>
+  <div class="card">
+    <h2>💾 Backup</h2>
+    <button id="exportBtn">Exportieren</button>
+    <button id="importBtn" class="secondary">Importieren</button>
+    <input id="importFile" type="file" accept=".json" hidden>
+  </div>
+</section>
 </main>
-<nav><button data-page="dashboard" class="active">🏠<span>Start</span></button><button data-page="meds">💊<span>Meds</span></button><button data-page="calendar">📅<span>Termine</span></button><button data-page="orders">🛒<span>Bestellen</span></button><button data-page="settings">⚙️<span>Mehr</span></button></nav>
-<script src="app.js"></script></body></html>
+
+<nav>
+  <button data-page="dashboard" class="active">🏠<span>Start</span></button>
+  <button data-page="meds">💊<span>Meds</span></button>
+  <button data-page="calendar">📅<span>Termine</span></button>
+  <button data-page="reminders">🔔<span>Erinnern</span></button>
+  <button data-page="orders">🛒<span>Bestellen</span></button>
+  <button data-page="stats">📊<span>Stats</span></button>
+  <button data-page="settings">⚙️<span>Mehr</span></button>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>

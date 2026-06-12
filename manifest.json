@@ -1,11 +1,11 @@
 {
-  "name": "Tabletten Erinnerung",
-  "short_name": "Tabletten",
+  "name": "MediPlan",
+  "short_name": "MediPlan",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#eef2f7",
   "theme_color": "#2563eb",
-  "description": "Dashboard-PWA mit Kalender Fix.",
+  "description": "Medikamente, Termine und Erinnerungen.",
   "icons": [
     {
       "src": "icon-192.png",
