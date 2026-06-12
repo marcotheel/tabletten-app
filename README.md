@@ -1,3 +1,3 @@
-# Tabletten Erinnerung – Dashboard mit Kalender
+# Tabletten Erinnerung – Kalender Fix
 
-Neu: Termine mit Titel, Datum, Uhrzeit, Ort und Notiz. Nächste Termine erscheinen auf der Startseite. Termine sind im Backup enthalten.
+Korrigiert: Termine werden nach dem Speichern sofort angezeigt und das Datum wird robuster verarbeitet.
