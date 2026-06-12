@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>MediPlan V7</title>
+<title>MediPlan V8</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
 <link rel="manifest" href="manifest.json">
@@ -16,15 +16,25 @@
 
 <main>
 <section id="page-dashboard" class="page active">
-  <div class="hero"><div><span id="greeting">Guten Tag</span><h2 id="dashboardTitle">Alles im Blick</h2><p id="dashboardSub">Dein Gesundheits-Dashboard</p></div></div>
+  <div class="hero">
+    <div><span id="greeting">Guten Tag</span><h2 id="dashboardTitle">Alles im Blick</h2><p>Dein Gesundheits-Dashboard</p></div>
+  </div>
   <div class="quick-grid"><button id="quickMed">＋ Medikament</button><button id="quickAppt">＋ Termin</button></div>
-  <div class="stats"><div><b id="total">0</b><span>Medikamente</span></div><div><b id="due">0</b><span>Offen</span></div><div><b id="critical">0</b><span>Bestellen</span></div><div><b id="progress">0%</b><span>Heute erledigt</span></div></div>
+  <div class="stats">
+    <div><b id="total">0</b><span>Medikamente</span></div>
+    <div><b id="due">0</b><span>Offen</span></div>
+    <div><b id="critical">0</b><span>Bestellen</span></div>
+    <div><b id="progress">0%</b><span>Heute erledigt</span></div>
+  </div>
   <div class="card highlight"><h2>⏰ Nächste Einnahme</h2><div id="nextDose"></div></div>
   <div class="card"><h2>📅 Nächster Termin</h2><div id="nextAppointment"></div></div>
   <div class="card"><h2>🛒 Nachbestellung</h2><div id="orderPreview"></div></div>
 </section>
 
-<section id="page-meds" class="page"><div class="head"><h2>💊 Medikamente</h2><button id="newMedBtn">＋ Neu</button></div><div id="medList"></div></section>
+<section id="page-meds" class="page">
+  <div class="head"><h2>💊 Medikamente</h2><button id="newMedBtn">＋ Neu</button></div>
+  <div id="medList"></div>
+</section>
 
 <section id="page-medform" class="page">
   <div class="card">
@@ -54,17 +64,26 @@
   <div class="card"><h2>Alle Termine</h2><div id="appointmentList"></div></div>
 </section>
 
-<section id="page-reminders" class="page"><div class="card"><h2>🔔 Offene Einnahmen</h2><div id="todayList"></div></div><div class="card"><h2>📅 Einnahmeprotokoll</h2><div id="historyList"></div><button id="clearHistoryBtn" class="danger">Protokoll löschen</button></div></section>
-<section id="page-orders" class="page"><div class="card"><h2>🛒 Nachbestellliste</h2><div id="orderList"></div><button id="copyOrderBtn" class="secondary">Liste kopieren</button></div></section>
-<section id="page-stats" class="page"><div class="card"><h2>📊 Statistik</h2><div id="statsText"></div></div></section>
-<section id="page-settings" class="page"><div class="card"><h2>👤 Profil</h2><label>Name<input id="profileName" placeholder="z. B. Marco"></label><button id="saveProfileBtn" class="secondary">Profil speichern</button></div><div class="card"><h2>⚙️ Server</h2><label>PZN-Server URL<input id="serverUrl"></label><button id="saveServerBtn" class="secondary">Server speichern</button></div><div class="card"><h2>💾 Backup</h2><button id="exportBtn">Exportieren</button><button id="importBtn" class="secondary">Importieren</button><input id="importFile" type="file" accept=".json" hidden></div></section>
+<section id="page-orders" class="page">
+  <div class="card"><h2>🛒 Nachbestellliste</h2><div id="orderList"></div><button id="copyOrderBtn" class="secondary">Liste kopieren</button></div>
+</section>
+
+<section id="page-stats" class="page">
+  <div class="card"><h2>📊 Tagesstatistik</h2><div id="statsText"></div></div>
+  <div class="card"><h2>📅 Einnahmeprotokoll</h2><div id="historyList"></div><button id="clearHistoryBtn" class="danger">Protokoll löschen</button></div>
+</section>
+
+<section id="page-settings" class="page">
+  <div class="card"><h2>👤 Profil</h2><label>Name<input id="profileName" placeholder="z. B. Marco"></label><button id="saveProfileBtn" class="secondary">Profil speichern</button></div>
+  <div class="card"><h2>⚙️ Server</h2><label>PZN-Server URL<input id="serverUrl"></label><button id="saveServerBtn" class="secondary">Server speichern</button><p class="muted">Raspberry Pi Beispiel: http://raspberrypi.local:5000</p></div>
+  <div class="card"><h2>💾 Backup</h2><button id="exportBtn">Exportieren</button><button id="importBtn" class="secondary">Importieren</button><input id="importFile" type="file" accept=".json" hidden></div>
+</section>
 </main>
 
 <nav>
   <button data-page="dashboard" class="active">🏠<span>Start</span></button>
   <button data-page="meds">💊<span>Meds</span></button>
   <button data-page="calendar">📅<span>Termine</span></button>
-  <button data-page="reminders">🔔<span>Erinnern</span></button>
   <button data-page="orders">🛒<span>Bestellen</span></button>
   <button data-page="stats">📊<span>Stats</span></button>
   <button data-page="settings">⚙️<span>Mehr</span></button>
