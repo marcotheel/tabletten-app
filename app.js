@@ -19,16 +19,49 @@ function sortedAppts(){return appts.slice().sort((a,b)=>(a.date+(a.time||"")).lo
 function upcomingAppts(){return sortedAppts().filter(a=>a.date>=today())}
 function nextDose(){return dueItems()[0]||null}
 function render(){$("greeting").textContent=greeting();$("total").textContent=meds.length;$("due").textContent=dueItems().length;$("critical").textContent=meds.filter(m=>status(m)[0]==="crit").length;$("progress").textContent=progressPct()+"%";$("dashboardTitle").textContent=dueItems().length?`${dueItems().length} Einnahme(n) offen`:"Alles erledigt";renderDoseTiles();renderNextAppointment();renderOrders();renderHistory();renderMeds();renderAppointments();renderStats()}
+
 function renderDoseTiles(){
- const list=dueItems();
- if(!list.length){
-  $("doseTiles").innerHTML='<div class="dose-empty">✅ Alle Einnahmen für heute sind bestätigt.</div>';
-  return;
- }
- $("doseTiles").innerHTML="";
- list.forEach(([m,t])=>$("doseTiles").insertAdjacentHTML("beforeend",`<div class="dose-tile"><div class="time">${esc(t)}</div><div class="name">💊 ${esc(m.name)}</div><div class="detail">${esc(m.strength||"")}${m.substance?`<br>${esc(m.substance)}`:""}<br>Bestand: ${esc(m.stock)} Stück</div><button class="green" onclick="take(${m.id},'${esc(t)}')">✓ Eingenommen</button></div>`));
- $("doseTiles").insertAdjacentHTML("beforeend",`<div class="dose-tile"><div class="time">${progressPct()}%</div><div class="name">📊 Tagesstatus</div><div class="detail">${doneCount()} von ${allDosesToday().length} Einnahmen erledigt</div><div class="progressbar"><div style="width:${progressPct()}%"></div></div></div>`);
+    const container = $("doseTiles");
+    if (!container) return;
+
+    const list = dueItems();
+    container.innerHTML = "";
+
+    if (!list.length) {
+        container.innerHTML = '<div class="dose-empty">✅ Alle Einnahmen für heute sind bestätigt.</div>';
+        return;
+    }
+
+    list.forEach(([m, t]) => {
+        const tile = document.createElement("div");
+        tile.className = "dose-tile";
+
+        const strength = m.strength ? esc(m.strength) : "";
+        const substance = m.substance ? esc(m.substance) : "";
+        const detailLines = [strength, substance, `Bestand: ${esc(m.stock)} Stück`].filter(Boolean).join("<br>");
+
+        tile.innerHTML = `
+            <div class="time">${esc(t)}</div>
+            <div class="name">💊 ${esc(m.name)}</div>
+            <div class="detail">${detailLines}</div>
+            <button class="green">✓ Eingenommen</button>
+        `;
+
+        tile.querySelector("button").addEventListener("click", () => take(m.id, t));
+        container.appendChild(tile);
+    });
+
+    const statusTile = document.createElement("div");
+    statusTile.className = "dose-tile";
+    statusTile.innerHTML = `
+        <div class="time">${progressPct()}%</div>
+        <div class="name">📊 Tagesstatus</div>
+        <div class="detail">${doneCount()} von ${allDosesToday().length} Einnahmen erledigt</div>
+        <div class="progressbar"><div style="width:${progressPct()}%"></div></div>
+    `;
+    container.appendChild(statusTile);
 }
+
 function renderNextAppointment(){const a=upcomingAppts()[0];$("nextAppointment").innerHTML=a?apptHtml(a,false):'<div class="muted">Kein kommender Termin.</div>'}
 function renderOrders(){const o=meds.filter(m=>status(m)[0]!=="ok");$("orderPreview").innerHTML=o.length?`<b>${o.length} Medikament(e) nachbestellen</b><button onclick="page('orders')" class="orange">Bestellliste öffnen</button>`:"Aktuell muss nichts nachbestellt werden.";$("orderList").innerHTML=o.length?"":"Aktuell muss nichts nachbestellt werden.";o.forEach(m=>$("orderList").insertAdjacentHTML("beforeend",`<div class="item">☐ <b>${esc(m.name)}</b><br><span class="muted">PZN: ${esc(m.pzn||"-")} · Bestand: ${esc(m.stock)}</span></div>`))}
 function dateDe(v){if(!v)return"";const [y,m,d]=v.split("-");return `${d}.${m}.${y}`}
