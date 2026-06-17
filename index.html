@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>MediPlan V8</title>
+<title>MediPlan V9</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
 <link rel="manifest" href="manifest.json">
@@ -42,7 +42,7 @@
     <label>Name / Handelsname<input id="name"></label>
     <div class="grid"><label>Wirkstoff<input id="substance"></label><label>Stärke/Form<input id="strength"></label></div>
     <div class="grid"><label>Hersteller<input id="manufacturer"></label><label>PZN/Barcode<input id="pzn"></label></div>
-    <button id="lookupBtn" class="secondary">PZN über Server suchen</button><p id="lookupInfo" class="muted"></p>
+    <button id="lookupBtn" class="secondary">PZN über Server suchen</button><p id="lookupInfo" class="muted"></p><label>Foto der Packung<input id="photo" type="file" accept="image/*"></label><div id="photoPreview" class="photo-preview hidden"></div>
     <div class="grid"><label>Packungsgröße<input id="packSize" type="number"></label><label>Bestand<input id="stock" type="number"></label></div>
     <div class="grid"><label>Einnahme je Einnahme<input id="dosePerTake" type="number" step="0.25" value="1"></label><label>Erinnern ab<input id="limit" type="number" value="10"></label></div>
     <label>Einnahmezeiten<input id="times" placeholder="08:00, 12:00, 20:00"></label>
@@ -76,7 +76,7 @@
 <section id="page-settings" class="page">
   <div class="card"><h2>👤 Profil</h2><label>Name<input id="profileName" placeholder="z. B. Marco"></label><button id="saveProfileBtn" class="secondary">Profil speichern</button></div>
   <div class="card"><h2>⚙️ Server</h2><label>PZN-Server URL<input id="serverUrl"></label><button id="saveServerBtn" class="secondary">Server speichern</button><p class="muted">Raspberry Pi Beispiel: http://raspberrypi.local:5000</p></div>
-  <div class="card"><h2>💾 Backup</h2><button id="exportBtn">Exportieren</button><button id="importBtn" class="secondary">Importieren</button><input id="importFile" type="file" accept=".json" hidden></div>
+  <div class="card"><h2>🏠 ioBroker</h2><label>ioBroker MediPlan API<input id="iobrokerUrl" placeholder="http://iobroker:8099"></label><button id="saveIoBrokerBtn" class="secondary">ioBroker speichern</button><button id="syncIoBrokerBtn">Mit ioBroker synchronisieren</button><p id="syncInfo" class="muted"></p></div><div class="card"><h2>💾 Backup</h2><button id="exportBtn">Exportieren</button><button id="importBtn" class="secondary">Importieren</button><input id="importFile" type="file" accept=".json" hidden></div>
 </section>
 </main>
 
