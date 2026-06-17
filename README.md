@@ -1,3 +1,3 @@
-# MediPlan V8 – Einnahme-Kacheln
+# MediPlan V8 – Einnahme-Kacheln Fix
 
-Offene Tabletten-Einnahmen werden auf der Startseite horizontal als Kacheln angezeigt und können direkt bestätigt werden.
+Korrigiert: offene Einnahmen werden als horizontale Kacheln angezeigt und können direkt bestätigt werden.
