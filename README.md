@@ -1,3 +1,5 @@
-# MediPlan V8 – Einnahme-Kacheln Fix
+# MediPlan V9 Bild-Fix
 
-Korrigiert: offene Einnahmen werden als horizontale Kacheln angezeigt und können direkt bestätigt werden.
+Korrigiert: Medikamentenfoto wird in Einnahme-Kachel und Medikamentenliste angezeigt.
+
+Hinweis: vorhandene Medikamente einmal bearbeiten und Foto hinzufügen.

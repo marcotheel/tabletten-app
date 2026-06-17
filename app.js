@@ -1,7 +1,7 @@
-const K_MED="mediplan_v7_meds",K_HIST="mediplan_v7_hist",K_APPT="mediplan_v7_appts_fix",K_SERVER="pzn_server_url",K_THEME="theme",K_PROFILE="mediplan_profile";
+const K_MED="mediplan_v7_meds",K_HIST="mediplan_v7_hist",K_APPT="mediplan_v7_appts_fix",K_SERVER="pzn_server_url",K_THEME="theme",K_PROFILE="mediplan_profile",K_IOBROKER="mediplan_iobroker_url";
 let meds=JSON.parse(localStorage.getItem(K_MED)||"[]"),hist=JSON.parse(localStorage.getItem(K_HIST)||"[]"),appts=JSON.parse(localStorage.getItem(K_APPT)||"[]"),profile=JSON.parse(localStorage.getItem(K_PROFILE)||"{}"),editId=null;
 const $=id=>document.getElementById(id),ids=["name","substance","strength","manufacturer","pzn","packSize","stock","dosePerTake","limit","times","note"],today=()=>new Date().toISOString().slice(0,10),save=()=>{localStorage.setItem(K_MED,JSON.stringify(meds));localStorage.setItem(K_HIST,JSON.stringify(hist));localStorage.setItem(K_APPT,JSON.stringify(appts));localStorage.setItem(K_PROFILE,JSON.stringify(profile))},esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])),times=s=>String(s||"").split(",").map(x=>x.trim()).filter(Boolean),fmt=d=>d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"}),now=()=>new Date().toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
-if(localStorage.getItem(K_THEME)==="dark")document.body.classList.add("dark");$("serverUrl").value=localStorage.getItem(K_SERVER)||"http://localhost:5000";$("profileName").value=profile.name||"";
+if(localStorage.getItem(K_THEME)==="dark")document.body.classList.add("dark");$("serverUrl").value=localStorage.getItem(K_SERVER)||"http://localhost:5000";$("profileName").value=profile.name||"";if($("iobrokerUrl"))$("iobrokerUrl").value=localStorage.getItem(K_IOBROKER)||"http://iobroker:8099";
 function page(n){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$("page-"+n).classList.add("active");document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===n));scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>page(b.dataset.page));$("quickMed").onclick=()=>newForm();$("newMedBtn").onclick=()=>newForm();$("quickAppt").onclick=()=>page("calendar");
 function normalizePzn(v){let s=String(v||"").replace(/\D/g,"");if(s.length>8)s=s.slice(-8);return s.replace(/^0+/,"")||s}
@@ -21,67 +21,79 @@ function nextDose(){return dueItems()[0]||null}
 function render(){$("greeting").textContent=greeting();$("total").textContent=meds.length;$("due").textContent=dueItems().length;$("critical").textContent=meds.filter(m=>status(m)[0]==="crit").length;$("progress").textContent=progressPct()+"%";$("dashboardTitle").textContent=dueItems().length?`${dueItems().length} Einnahme(n) offen`:"Alles erledigt";renderDoseTiles();renderNextAppointment();renderOrders();renderHistory();renderMeds();renderAppointments();renderStats()}
 
 function renderDoseTiles(){
-    const container = $("doseTiles");
-    if (!container) return;
-
-    const list = dueItems();
-    container.innerHTML = "";
-
-    if (!list.length) {
-        container.innerHTML = '<div class="dose-empty">✅ Alle Einnahmen für heute sind bestätigt.</div>';
-        return;
-    }
-
-    list.forEach(([m, t]) => {
-        const tile = document.createElement("div");
-        tile.className = "dose-tile";
-
-        const strength = m.strength ? esc(m.strength) : "";
-        const substance = m.substance ? esc(m.substance) : "";
-        const detailLines = [strength, substance, `Bestand: ${esc(m.stock)} Stück`].filter(Boolean).join("<br>");
-
-        tile.innerHTML = `
-            <div class="time">${esc(t)}</div>
-            <div class="name">💊 ${esc(m.name)}</div>
-            <div class="detail">${detailLines}</div>
-            <button class="green">✓ Eingenommen</button>
-        `;
-
-        tile.querySelector("button").addEventListener("click", () => take(m.id, t));
-        container.appendChild(tile);
-    });
-
-    const statusTile = document.createElement("div");
-    statusTile.className = "dose-tile";
-    statusTile.innerHTML = `
-        <div class="time">${progressPct()}%</div>
-        <div class="name">📊 Tagesstatus</div>
-        <div class="detail">${doneCount()} von ${allDosesToday().length} Einnahmen erledigt</div>
-        <div class="progressbar"><div style="width:${progressPct()}%"></div></div>
-    `;
-    container.appendChild(statusTile);
+ const container=$("doseTiles");
+ if(!container)return;
+ const list=dueItems();
+ container.innerHTML="";
+ if(!list.length){container.innerHTML='<div class="dose-empty">✅ Alle Einnahmen für heute sind bestätigt.</div>';return;}
+ list.forEach(([m,t])=>{
+  const tile=document.createElement("div");
+  tile.className="dose-tile";
+  const img=m.photoData?`<img class="dose-photo" src="${m.photoData}" alt="Foto von ${esc(m.name)}">`:`<div class="dose-photo" style="display:flex;align-items:center;justify-content:center;font-size:42px;">💊</div>`;
+  const strength=m.strength?esc(m.strength):"";
+  const substance=m.substance?esc(m.substance):"";
+  const detail=[strength,substance,`Bestand: ${esc(m.stock)} Stück`].filter(Boolean).join("<br>");
+  tile.innerHTML=`${img}<div class="time">${esc(t)}</div><div class="name">💊 ${esc(m.name)}</div><div class="detail">${detail}</div><button class="green">✓ Eingenommen</button>`;
+  tile.querySelector("button").addEventListener("click",()=>take(m.id,t));
+  container.appendChild(tile);
+ });
+ const statusTile=document.createElement("div");
+ statusTile.className="dose-tile";
+ statusTile.innerHTML=`<div class="time">${progressPct()}%</div><div class="name">📊 Tagesstatus</div><div class="detail">${doneCount()} von ${allDosesToday().length} Einnahmen erledigt</div><div class="progressbar"><div style="width:${progressPct()}%"></div></div>`;
+ container.appendChild(statusTile);
 }
-
 function renderNextAppointment(){const a=upcomingAppts()[0];$("nextAppointment").innerHTML=a?apptHtml(a,false):'<div class="muted">Kein kommender Termin.</div>'}
 function renderOrders(){const o=meds.filter(m=>status(m)[0]!=="ok");$("orderPreview").innerHTML=o.length?`<b>${o.length} Medikament(e) nachbestellen</b><button onclick="page('orders')" class="orange">Bestellliste öffnen</button>`:"Aktuell muss nichts nachbestellt werden.";$("orderList").innerHTML=o.length?"":"Aktuell muss nichts nachbestellt werden.";o.forEach(m=>$("orderList").insertAdjacentHTML("beforeend",`<div class="item">☐ <b>${esc(m.name)}</b><br><span class="muted">PZN: ${esc(m.pzn||"-")} · Bestand: ${esc(m.stock)}</span></div>`))}
 function dateDe(v){if(!v)return"";const [y,m,d]=v.split("-");return `${d}.${m}.${y}`}
 function apptHtml(a,del){return `<div class="item"><b>${esc(a.title)}</b><br>${esc(dateDe(a.date))}${a.time?` · ${esc(a.time)} Uhr`:""}${a.location?`<br><span class="muted">${esc(a.location)}</span>`:""}${a.note?`<br><span class="muted">${esc(a.note)}</span>`:""}${del?`<button class="danger" onclick="deleteAppt(${a.id})">Termin löschen</button>`:""}</div>`}
 function renderAppointments(){$("appointmentList").innerHTML=appts.length?"":'<div class="muted">Noch keine Termine.</div>';sortedAppts().forEach(a=>$("appointmentList").insertAdjacentHTML("beforeend",apptHtml(a,true)))}
 function renderHistory(){$("historyList").innerHTML=hist.length?"":'<div class="muted">Noch kein Protokoll.</div>';hist.slice().reverse().slice(0,60).forEach(h=>$("historyList").insertAdjacentHTML("beforeend",`<div class="item"><b>${esc(h.medName)}</b><br>${h.type==="taken"?"Eingenommen":"Neue Packung"} · ${esc(h.time)}<br><span class="muted">${esc(h.created)}</span></div>`))}
-function renderMeds(){$("medList").innerHTML=meds.length?"":'<div class="item muted">Noch kein Medikament.</div>';meds.slice().sort((a,b)=>calc(a).remind-calc(b).remind).forEach(m=>{const c=calc(m),s=status(m);$("medList").insertAdjacentHTML("beforeend",`<div class="med ${s[0]}"><h3>💊 ${esc(m.name)} <span class="badge ${s[0]}">${s[1]}</span></h3>Bestand: <b>${esc(m.stock)}</b><br>Einnahmezeiten: <b>${esc((m.times||[]).join(", ")||"manuell")}</b><br>Reicht noch: <b>${c.days} Tage</b><br>Nachbestellen ab: <b>${fmt(c.reminder)}</b><div class="grid"><button class="green" onclick="take(${m.id},'manuell')">Jetzt eingenommen</button><button class="orange" onclick="pack(${m.id})">Neue Packung</button><button onclick="edit(${m.id})">Bearbeiten</button><button class="danger" onclick="delMed(${m.id})">Löschen</button></div></div>`)});}
+function renderMeds(){$("medList").innerHTML=meds.length?"":'<div class="item muted">Noch kein Medikament.</div>';meds.slice().sort((a,b)=>calc(a).remind-calc(b).remind).forEach(m=>{const c=calc(m),s=status(m);$("medList").insertAdjacentHTML("beforeend",`<div class="med ${s[0]}"><h3>💊 ${esc(m.name)} <span class="badge ${s[0]}">${s[1]}</span></h3>${m.photoData?`<img class="med-photo" src="${m.photoData}" alt="">`:""}Bestand: <b>${esc(m.stock)}</b><br>Einnahmezeiten: <b>${esc((m.times||[]).join(", ")||"manuell")}</b><br>Reicht noch: <b>${c.days} Tage</b><br>Nachbestellen ab: <b>${fmt(c.reminder)}</b><div class="grid"><button class="green" onclick="take(${m.id},'manuell')">Jetzt eingenommen</button><button class="orange" onclick="pack(${m.id})">Neue Packung</button><button onclick="edit(${m.id})">Bearbeiten</button><button class="danger" onclick="delMed(${m.id})">Löschen</button></div></div>`)});}
 function renderStats(){const all=allDosesToday().length,done=doneCount(),missed=dueItems().length;$("statsText").innerHTML=`<div class="item"><b>Einnahmetreue heute</b><div class="progressbar"><div style="width:${progressPct()}%"></div></div>${done} von ${all} erledigt (${progressPct()}%)</div><div class="item"><b>Offene Einnahmen</b><br>${missed}</div><div class="item"><b>Kritische Bestände</b><br>${meds.filter(m=>status(m)[0]==="crit").length}</div>`}
+
+function readPhoto(){
+ return new Promise(resolve=>{
+  const input=$("photo");
+  if(!input||!input.files||!input.files[0]){resolve(null);return;}
+  const r=new FileReader();
+  r.onload=()=>resolve(r.result);
+  r.onerror=()=>resolve(null);
+  r.readAsDataURL(input.files[0]);
+ });
+}
+function updatePhotoPreview(data){
+ const box=$("photoPreview");
+ if(!box)return;
+ if(data){box.classList.remove("hidden");box.innerHTML=`<img src="${data}" alt="Medikamentenfoto">`;}
+ else{box.classList.add("hidden");box.innerHTML="";}
+}
+
 function readForm(){return{id:editId||Date.now(),name:$("name").value.trim(),substance:$("substance").value.trim(),strength:$("strength").value.trim(),manufacturer:$("manufacturer").value.trim(),pzn:normalizePzn($("pzn").value),packSize:+$("packSize").value,stock:+$("stock").value,dosePerTake:+$("dosePerTake").value,limit:+$("limit").value,times:times($("times").value),note:$("note").value.trim()}}
-function clearForm(){editId=null;ids.forEach(id=>$(id).value="");$("dosePerTake").value=1;$("limit").value=10;$("formTitle").textContent="Medikament anlegen";$("lookupInfo").textContent=""}
+function clearForm(){editId=null;ids.forEach(id=>$(id).value="");$("dosePerTake").value=1;$("limit").value=10;$("formTitle").textContent="Medikament anlegen";$("lookupInfo").textContent="";if($("photo"))$("photo").value="";updatePhotoPreview(null)}
 function newForm(){clearForm();page("medform")}
 function saveForm(){const m=readForm();if(!m.name||m.packSize<1||m.stock<0||m.dosePerTake<=0||m.limit<0){alert("Bitte Pflichtfelder ausfüllen.");return}meds=editId?meds.map(x=>x.id===editId?m:x):[...meds,m];save();clearForm();render();page("meds")}
-function edit(id){const m=meds.find(x=>x.id===id);editId=id;ids.forEach(k=>$(k).value=k==="times"?(m.times||[]).join(", "):(m[k]??""));$("formTitle").textContent="Medikament bearbeiten";page("medform")}
+function edit(id){const m=meds.find(x=>x.id===id);editId=id;ids.forEach(k=>$(k).value=k==="times"?(m.times||[]).join(", "):(m[k]??""));$("formTitle").textContent="Medikament bearbeiten";updatePhotoPreview(m.photoData||null);page("medform")}
 function delMed(id){if(confirm("Medikament löschen?")){meds=meds.filter(m=>m.id!==id);save();render()}}
 function take(id,t){const m=meds.find(x=>x.id===id);if(!m)return;m.stock=Math.max(0,Number(m.stock)-Number(m.dosePerTake||1));hist.push({id:Date.now(),medId:id,medName:m.name,type:"taken",time:t,date:today(),created:now()});save();render()}
 function pack(id){const m=meds.find(x=>x.id===id);if(!m)return;m.stock=Number(m.stock)+Number(m.packSize||0);hist.push({id:Date.now(),medId:id,medName:m.name,type:"pack",time:"Packung",date:today(),created:now()});save();render()}
 function saveAppt(){const title=$("apptTitle").value.trim(),date=normalizeDate($("apptDate").value),time=$("apptTime").value,location=$("apptLocation").value.trim(),note=$("apptNote").value.trim();if(!title||!date){$("apptInfo").textContent="Bitte Titel und Datum eintragen.";alert("Bitte Titel und Datum eintragen.");return}appts.push({id:Date.now(),title,date,time,location,note});["apptTitle","apptDate","apptTime","apptLocation","apptNote"].forEach(id=>$(id).value="");$("apptInfo").textContent="Termin wurde gespeichert.";save();render();page("calendar")}
 function deleteAppt(id){if(confirm("Termin löschen?")){appts=appts.filter(a=>a.id!==id);save();render()}}
-function exportBackup(){const blob=new Blob([JSON.stringify({version:"mediplan-v8",meds,hist,appts,profile},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mediplan-backup-v8.json";a.click()}
+function exportBackup(){const blob=new Blob([JSON.stringify({version:"mediplan-v9",meds,hist,appts,profile},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mediplan-backup-v9.json";a.click()}
 function importBackup(f){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);meds=d.meds||[];hist=d.hist||[];appts=d.appts||[];profile=d.profile||{};save();render();alert("Backup importiert.")}catch{alert("Backup ungültig.")}};r.readAsText(f)}
 function copyOrders(){const o=meds.filter(m=>status(m)[0]!=="ok").map(m=>`- ${m.name} | PZN: ${m.pzn||"-"} | Bestand: ${m.stock}`).join("\\n")||"Aktuell muss nichts nachbestellt werden.";navigator.clipboard?.writeText(o).then(()=>alert("Kopiert."),()=>alert(o))}
-$("lookupBtn").onclick=lookupPzn;$("saveBtn").onclick=saveForm;$("cancelBtn").onclick=()=>{clearForm();page("meds")};$("saveApptBtn").onclick=saveAppt;$("saveServerBtn").onclick=()=>{localStorage.setItem(K_SERVER,($("serverUrl").value||"").replace(/\/$/,""));alert("Server gespeichert.")};$("saveProfileBtn").onclick=()=>{profile.name=$("profileName").value.trim();save();render();alert("Profil gespeichert.")};$("exportBtn").onclick=exportBackup;$("importBtn").onclick=()=>$("importFile").click();$("importFile").onchange=e=>e.target.files[0]&&importBackup(e.target.files[0]);$("clearHistoryBtn").onclick=()=>{if(confirm("Protokoll löschen?")){hist=[];save();render()}};$("copyOrderBtn").onclick=copyOrders;$("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem(K_THEME,document.body.classList.contains("dark")?"dark":"light")};
-if("serviceWorker" in navigator)navigator.serviceWorker.register("service-worker.js");render();
+
+async function syncIoBroker(){
+ const url=(localStorage.getItem(K_IOBROKER)||"").replace(/\/$/,"");
+ if(!url){$("syncInfo").textContent="Bitte zuerst ioBroker API eintragen.";return}
+ $("syncInfo").textContent="Synchronisiere...";
+ try{
+  const r=await fetch(`${url}/api/sync`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({version:"mediplan-v9",meds,hist,appts,profile})});
+  if(!r.ok)throw new Error("Fehler");
+  $("syncInfo").textContent="Synchronisation erfolgreich.";
+ }catch(e){
+  $("syncInfo").textContent="ioBroker nicht erreichbar oder API blockiert.";
+ }
+}
+
+$("lookupBtn").onclick=lookupPzn;$("saveBtn").onclick=saveForm;$("cancelBtn").onclick=()=>{clearForm();page("meds")};$("saveApptBtn").onclick=saveAppt;$("saveServerBtn").onclick=()=>{localStorage.setItem(K_SERVER,($("serverUrl").value||"").replace(/\/$/,""));alert("Server gespeichert.")};if($("saveIoBrokerBtn"))$("saveIoBrokerBtn").onclick=()=>{localStorage.setItem(K_IOBROKER,($("iobrokerUrl").value||"").replace(/\/$/,""));alert("ioBroker gespeichert.")};if($("syncIoBrokerBtn"))$("syncIoBrokerBtn").onclick=syncIoBroker;$("saveProfileBtn").onclick=()=>{profile.name=$("profileName").value.trim();save();render();alert("Profil gespeichert.")};$("exportBtn").onclick=exportBackup;$("importBtn").onclick=()=>$("importFile").click();$("importFile").onchange=e=>e.target.files[0]&&importBackup(e.target.files[0]);$("clearHistoryBtn").onclick=()=>{if(confirm("Protokoll löschen?")){hist=[];save();render()}};$("copyOrderBtn").onclick=copyOrders;$("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem(K_THEME,document.body.classList.contains("dark")?"dark":"light")};
+if($("photo"))$("photo").addEventListener("change",async()=>updatePhotoPreview(await readPhoto()));if("serviceWorker" in navigator)navigator.serviceWorker.register("service-worker.js");render();
